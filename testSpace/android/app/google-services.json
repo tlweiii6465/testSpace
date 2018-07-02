@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "946927529427",
+    "firebase_url": "https://testspace-d43d7.firebaseio.com",
+    "project_id": "testspace-d43d7",
+    "storage_bucket": "testspace-d43d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946927529427:android:483670202f489316",
+        "android_client_info": {
+          "package_name": "com.testspace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "946927529427-02f5qjd0ota6ov8tlimtgan3gr7t5vh3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiz38tw3G2Qq8LWX-nB3k54g8DzCelBJc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
