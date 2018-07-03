@@ -1,136 +1,130 @@
 import React, {Component} from 'react';
+import { Platform, AsyncStorage, AppState, StyleSheet,View, Text } from 'react-native';
+import { Grid, Row, Col, Container, Left, Button, Icon, Body, Right,Content } from 'native-base';
+import BlinkView from 'react-native-blink-view';
+import Moment from "moment";
+class App extends Component{
 
-import { Platform, AsyncStorage, AppState, StyleSheet,View, Text,Button } from 'react-native';
+  constructor(props) {
+    super(props);
+    this.state = {
+      isBlinking: true,
+      test: 1,
+      time: new Date().toLocaleString()
+    };
+}
+componentDidMount() {
+  //for update time in every second
+  this.intervalID = setInterval(
+    () => this.tick(),
+    1000
+  );
+  //for update api data in every min
+  this.intervalAPI = setInterval(
+    () => this.load(),
+    5000
+    
+  ); 
+}
 
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType, NotificationActionType, NotificationActionOption, NotificationCategoryOption} from "react-native-fcm";
-import { Toast } from "native-base";
+async load(){
 
-const i = 0;
+  fetch('https://facebook.github.io/react-native/movies.json', {method: "GET"})
+   .then((response) => response.json())
+   .then((responseData) =>
+   {
+     //set your data here
+     var testing = responseData.movies[4].id
+     console.log(testing)
+      this.setState({
+        test:testing,
+      })
+   })
+   .catch((error) => {
+       console.error(error);
+   });
+   
+ 
+ }
 
-FCM.on(FCMEvent.Notification,async(notif)=>{
-  if(notif.local_notification){
-    console.log("what is that?")
+componentWillUnmount() {
+  clearInterval(this.intervalID,this.intervalAPI);
 
-  }
+}
+tick() {
+  this.setState({
+    time: new Date().toLocaleString()
+  });
+}
+  render() {
+    ///count time period (AM/PM)
+    var timeP = Moment(this.state.time).format("HH")
+    var timePeroid = (timeP > 11) ? "PM" : "AM";
 
-  if (notif.fcm) {
-    this.title = notif.fcm.title
-    this.body = notif.fcm.body
-    FCM.presentLocalNotification({
-      id: "testnotif",
-      fire_date: new Date().getTime() + 5000,
-      vibrate: 500,
-      sound: "bell.mp3",
-      click_action: "com.testspace",
-      badge: 1,
-      title: this.title,
-      body: this.body,
-      // sub_text: "sub text",
-      priority: "high",
-      large_icon:
-        "https://image.freepik.com/free-icon/small-boy-cartoon_318-38077.jpg",
-      show_in_foreground: true,
-      // picture:
-      //   "https://firebase.google.com/_static/af7ae4b3fc/images/firebase/lockup.png",
-      wake_screen: true,
-      extra1: { a: 1 },
-      extra2: 1
-    });
-    console.log(this.title, this.body)
-  }
-
-  if(notif.opened_from_tray){
-    console.log("Onpress Location")
-  }
-
-  if(Platform.OS === 'ios'){
-    switch(notif._notificationType){
-      case NotificationType.Remote:
-        notif.finish(RemoteNotificationResult.NewData)
-        break;
-        case NotificationActionType.NotificationResponse:
-        notif.finish();
-        break;
-        case NotificationType.WillPresent:
-          notif.finish(WillPresentNotificationResult.All)
-          break;
+    if(timeP > 12) {
+      timeP -= 12;
+    } else if(timeP == 0) {
+      timeP = "12";
     }
-  }
-});
-FCM.on(FCMEvent.RefreshToken,(token)=>{
-  console.log(token)
-});
+    //////////
+    return (
+      <Container style={styles.container}>
+        <Content style={styles.borderContent}>
+          <View  style={styles.welcome}>
+            <Text style={styles.welcomeFont}>RM{this.state.test}.00</Text>
+       
+            <Row>
+            <BlinkView blinking={this.state.isBlinking?true:false} delay={600}>
+              <Text style={[styles.center,{color:"#ce1502"}]}>● LIVE </Text>
+            </BlinkView>
+            <Text className="App-clock" style={styles.center}>
+                {Moment(this.state.time).format("hh : mm : ss")} {timePeroid}  AngPow Pool
+            </Text>
+            </Row>
 
-const instructions = Platform.select({
-  ios:'Press Cmd+R to reload,\n'+
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n'+
-  'Shake or press menu button for dev menu',
-});
-
-export default class App extends Component{
-  componentWillMount(){
-    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('Get permission'))
-
-    FCM.getFCMToken().then(token => {
-      console.warn(token)
-    });
-
-    this.notificationListener = FCM.on(FCMEvent.Notification,async(notif)=>{
-
-    });
-
-    FCM.getInitialNotification().then(notif => {
-      console.log(notif)
-    });
-  }
-  render(){
-    return(
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Push notification 
-        </Text>
-        <Text style={styles.instructions}>
-          Getting Start 
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
-        <Button title="Subscribe" onPress={() => {
-            console.log("Here we GO!");
-            if(i==0){
-              FCM.subscribeToTopic('news');
-              console.log("SUB!");
-              title="Subscribe";
-              i=1;
-            }else if(i==1){
-              FCM.unsubscribeFromTopic('news');
-              console.log("UNSUB!");
-              title="Unsubscribe";
-              i=0;
-            }
-          }} style={styles.welcome}>   
-        </Button>
-      </View>
+         
+           
+          </View>
+        </Content>
+        <Content>
+          <Text style={styles.welcome}>QAA TEST</Text>
+        </Content>
+        <Content><Text style={styles.welcome}>QAA TEST</Text></Content>
+      </Container>
+      // <View>
+      //   <Text style={styles.container}>RM888.00</Text>
+      //   
+   
+      // </View>
     )
   }
 }
-
+export default App;
+/////////
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
+    
+  },
+  welcomeFont: {
+    color:"#ce1502",
+    fontSize: 40, 
+    textAlign: 'center',
+    borderBottomWidth:4,
+    borderBottomColor:"gold"
   },
   welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    padding: 50,
   },
-  instructions: {
+  center:{
+    fontSize: 15, 
     textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
   },
+  borderContent:{
+    backgroundColor: 'white',
+    borderWidth:1,
+    borderColor:'#cecece',
+  }
 });
+/////////////
