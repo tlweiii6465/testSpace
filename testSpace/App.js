@@ -3,6 +3,7 @@ import { Platform, AsyncStorage, AppState, StyleSheet,View, Text } from 'react-n
 import { Grid, Row, Col, Container, Left, Button, Icon, Body, Right,Content } from 'native-base';
 import BlinkView from 'react-native-blink-view';
 import Moment from "moment";
+import AnimateNumber from 'react-native-animate-number'
 class App extends Component{
 
   constructor(props) {
@@ -22,22 +23,23 @@ componentDidMount() {
   //for update api data in every min
   this.intervalAPI = setInterval(
     () => this.load(),
-    5000
+    3000
     
   ); 
 }
 
 async load(){
-
+  var old = this.state.test;
   fetch('https://facebook.github.io/react-native/movies.json', {method: "GET"})
    .then((response) => response.json())
    .then((responseData) =>
    {
      //set your data here
      var testing = responseData.movies[4].id
-     console.log(testing)
+     
+     let rdnubmer = Math.floor((Math.random() * 100) + 1)
       this.setState({
-        test:testing,
+        test:old+rdnubmer,
       })
    })
    .catch((error) => {
@@ -57,6 +59,7 @@ tick() {
   });
 }
   render() {
+    console.log(this.state.test)
     ///count time period (AM/PM)
     var timeP = Moment(this.state.time).format("HH")
     var timePeroid = (timeP > 11) ? "PM" : "AM";
@@ -71,7 +74,14 @@ tick() {
       <Container style={styles.container}>
         <Content style={styles.borderContent}>
           <View  style={styles.welcome}>
-            <Text style={styles.welcomeFont}>RM{this.state.test}.00</Text>
+            <Text style={styles.welcomeFont}>RM          
+              <AnimateNumber value={this.state.test}
+                countBy={1}
+                timing={(interval, progress) => {
+                // slow start, slow end
+                return interval * (10 - Math.sin(Math.PI*progress) )*10
+              }}/>
+            .00</Text>
        
             <Row>
             <BlinkView blinking={this.state.isBlinking?true:false} delay={600}>
@@ -81,7 +91,7 @@ tick() {
                 {Moment(this.state.time).format("hh : mm : ss")} {timePeroid}  AngPow Pool
             </Text>
             </Row>
-
+            
          
            
           </View>
