@@ -69,7 +69,7 @@ tick() {
     } else if(timeP == 0) {
       timeP = "12";
     }
-    //////////
+    /////////
     return (
       <Container style={styles.container}>
         <Content style={styles.borderContent}>
