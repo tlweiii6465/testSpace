@@ -37,7 +37,7 @@ export default class CustomActions extends React.Component {
   }
 
   onActionsPress() {
-    const options = ['Picture', 'Location','Camera', 'Cancel'];
+    const options = ['Picture', 'Location', 'Camera', 'Audio', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
       options,
@@ -62,14 +62,17 @@ export default class CustomActions extends React.Component {
             {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
           );
           break;
-          case 2:
+        case 2:
             ImagePicker.launchCamera({title:"Please click photo"}, (response) => {
             this.props.onSend([{
             image: response.uri,
             }]);
             this.setImages([]);
             });
-            break;
+          break;
+        case 3:
+            this.setModalVisible(true);
+          break;
         default:
       }
     });
