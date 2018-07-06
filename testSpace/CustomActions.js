@@ -8,22 +8,22 @@ import {
   View,
   ViewPropTypes,
   Text,
+  Image
 } from 'react-native';
-import { Grid, Row, Col, Container, Content, Button, List, ListItem, Header, Left, Icon, Body, Title, Right, Toast } from "native-base";
 import CustomView from "./CustomView";
 import CameraRollPicker from 'react-native-camera-roll-picker';
 import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
 let audioPath = AudioUtils.DocumentDirectoryPath + '/test.aac';
 var ImagePicker = require('react-native-image-picker');
-
+var i = 0;
 export default class CustomActions extends React.Component {
   constructor(props) {
     super(props);
-    this.text="";
     this._images = [];
     this.state = {
       modalVisible: false,
+      modalVisible2: false,
     };
     this.onActionsPress = this.onActionsPress.bind(this);
     this.selectImages = this.selectImages.bind(this);
@@ -39,6 +39,10 @@ export default class CustomActions extends React.Component {
 
   setModalVisible(visible = false) {
     this.setState({modalVisible: visible});
+  }
+
+  setModalVisible2(visible2 = false) {
+    this.setState({modalVisible2: visible2});
   }
 
   onActionsPress() {
@@ -75,12 +79,8 @@ export default class CustomActions extends React.Component {
             this.setImages([]);
             });
           break;
-        case 3:  
-          this.props.onSend({
-            ////////////////
-            ////////////////
-          });
-      
+        case 3:
+            this.setModalVisible2(true);
           break;
         default:
       }
@@ -141,7 +141,6 @@ export default class CustomActions extends React.Component {
       return this.props.icon();
     }
     return (
-  
       <View
         style={[styles.wrapper, this.props.wrapperStyle]}
       >
@@ -151,7 +150,6 @@ export default class CustomActions extends React.Component {
           +
         </Text>
       </View>
-
     );
   }
 
@@ -163,7 +161,7 @@ export default class CustomActions extends React.Component {
       >
         <Modal
           animationType={'slide'}
-          transparent={false}
+          
           visible={this.state.modalVisible}
           onRequestClose={() => {
             this.setModalVisible(false);
@@ -171,12 +169,50 @@ export default class CustomActions extends React.Component {
         >
           {this.renderNavBar()}
           <CameraRollPicker
+          
             maximum={10}
             imagesPerRow={4}
             callback={this.selectImages}
             selected={[]}
           />
         </Modal>
+         
+        <Modal
+          animationType={'slide'}
+          transparent={true}      
+          visible={this.state.modalVisible2}
+          onRequestClose={() => {
+            this.setModalVisible2(false);
+          }}
+        >
+        <View style={{
+          
+          justifyContent: 'center',
+          alignItems: 'center',
+          }}>
+         <NavButton style={{
+           
+           padding:20,
+           backgroundColor:'rgba(0, 0, 0, .4)',
+           borderRadius:40,
+           width:'70%',
+           height:'70%',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          }} onPress={() => {
+          this.setModalVisible2(false);
+        }}>
+          <NavButtonText>
+            <Image source={require('./asset/imgs/white-speak.png')} />           
+          </NavButtonText>
+          <Text style={{fontWeight: 'bold',fontSize:15,color:'white'}}>Press to voice message</Text>
+          <Text style={{fontWeight: 'bold',fontSize:30,color:'white'}}>0s</Text>
+        </NavButton>
+       
+        </View>
+        </Modal>
+   
         {this.renderIcon()}
       </TouchableOpacity>
     );
