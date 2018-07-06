@@ -1,266 +1,234 @@
-
-import React, {Component} from 'react';
-
+import React, { Component } from 'react';
 import {
-  AppRegistry,
+  Platform,
   StyleSheet,
   Text,
   View,
-  TouchableHighlight,
-  Platform,
-  PermissionsAndroid,
 } from 'react-native';
-import { Grid, Row, Col, Container, Left, Button, Icon, Body, Right } from 'native-base';
-import Sound from 'react-native-sound';
-import {AudioRecorder, AudioUtils} from 'react-native-audio';
-var i = 0;
-class AudioExample extends Component {
 
-    state = {
-      currentTime: "",
-      recording: false,
-      paused: false,
-      stoppedRecording: false,
-      finished: false,
-      audioPath: AudioUtils.DocumentDirectoryPath + '/test.aac',
-      hasPermission: undefined,
+import {GiftedChat, Actions, Bubble} from 'react-native-gifted-chat';
+import CustomActions from './CustomActions';
+import CustomView from './CustomView';
+
+export default class Example extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      messages: [],
+      loadEarlier: true,
+      typingText: null,
+      isLoadingEarlier: false,
     };
 
-    prepareRecordingPath(audioPath){
-      AudioRecorder.prepareRecordingAtPath(audioPath, {
-        SampleRate: 22050,
-        Channels: 1,
-        AudioQuality: "Low",
-        AudioEncoding: "aac",
-        AudioEncodingBitRate: 32000
-      });
-    }
+    this._isMounted = false;
+    this.onSend = this.onSend.bind(this);
+    this.onReceive = this.onReceive.bind(this);
+    this.renderCustomActions = this.renderCustomActions.bind(this);
+    this.renderBubble = this.renderBubble.bind(this);
+    this.renderFooter = this.renderFooter.bind(this);
+    this.onLoadEarlier = this.onLoadEarlier.bind(this);
 
-    componentDidMount() {
-      this._checkPermission().then((hasPermission) => {
-        this.setState({ hasPermission });
+    this._isAlright = null;
+  }
 
-        if (!hasPermission) return;
-
-        this.prepareRecordingPath(this.state.audioPath);
-
-        AudioRecorder.onProgress = (data) => {
-          this.setState({currentTime: Math.floor(data.currentTime)});
-        };
-
-        AudioRecorder.onFinished = (data) => {
-          // Android callback comes in the form of a promise instead.
-          if (Platform.OS === 'ios') {
-            this._finishRecording(data.status === "OK", data.audioFileURL);
-          }
-        };
-      });
-    }
-
-    _checkPermission() {
-      if (Platform.OS !== 'android') {
-        return Promise.resolve(true);
-      }
-
-      const rationale = {
-        'title': 'Microphone Permission',
-        'message': 'AudioExample needs access to your microphone so you can record audio.'
+  componentWillMount() {
+    this._isMounted = true;
+    this.setState(() => {
+      return {
+        messages: require('./data/messages.js'),
       };
+    });
+  }
 
-      return PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, rationale)
-        .then((result) => {
-          console.log('Permission result:', result);
-          return (result === true || result === PermissionsAndroid.RESULTS.GRANTED);
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  onLoadEarlier() {
+    this.setState((previousState) => {
+      return {
+        isLoadingEarlier: true,
+      };
+    });
+
+    setTimeout(() => {
+      if (this._isMounted === true) {
+        this.setState((previousState) => {
+          return {
+            messages: GiftedChat.prepend(previousState.messages, require('./data/old_messages.js')),
+            loadEarlier: false,
+            isLoadingEarlier: false,
+          };
         });
-    }
-
-    _renderButton(title, onPress, active) {
-      var style = (active) ? styles.activeButtonText : styles.buttonText;
-
-      return (
-        <TouchableHighlight style={styles.button} onPress={onPress}>
-          <Text style={style}>
-            {title}
-          </Text>
-        </TouchableHighlight>
-      );
-    }
-
-    _renderPauseButton(onPress, active) {
-      var style = (active) ? styles.activeButtonText : styles.buttonText;
-      var title = this.state.paused ? "RESUME" : "PAUSE";
-      return (
-        <TouchableHighlight style={styles.button} onPress={onPress}>
-          <Text style={style}>
-            {title}
-          </Text>
-        </TouchableHighlight>
-      );
-    }
-
-    async _pause() {
-      if (!this.state.recording) {
-        console.warn('Can\'t pause, not recording!');
-        return;
       }
+    }, 1000); // simulating network
+  }
 
-      try {
-        const filePath = await AudioRecorder.pauseRecording();
-        this.setState({paused: true});
-      } catch (error) {
-        console.error(error);
+  onSend(messages = []) {
+    this.setState((previousState) => {
+      return {
+        messages: GiftedChat.append(previousState.messages, messages),
+      };
+    });
+
+    // for demo purpose
+    this.answerDemo(messages);
+  }
+
+  answerDemo(messages) {
+    if (messages.length > 0) {
+      if ((messages[0].image || messages[0].location) || !this._isAlright) {
+        this.setState((previousState) => {
+          return {
+            typingText: 'Sith lord Darth Vader is typing'
+          };
+        });
       }
     }
 
-    async _resume() {
-      if (!this.state.paused) {
-        console.warn('Can\'t resume, not paused!');
-        return;
-      }
+    setTimeout(() => {
+      if (this._isMounted === true) {
+        if (messages.length > 0) {
+          if (messages[0].image) {
+            this.onReceive('Nice picture!');
+          } else if (messages[0].location) {
+            this.onReceive('My favorite place');
+          } else {
+            if (!this._isAlright) {
+              this._isAlright = true;
 
-      try {
-        await AudioRecorder.resumeRecording();
-        this.setState({paused: false});
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async _stop() {
-      if (!this.state.recording) {
-        console.warn('Can\'t stop, not recording!');
-        return;
-      }
-
-      this.setState({stoppedRecording: true, recording: false, paused: false});
-
-      try {
-        const filePath = await AudioRecorder.stopRecording();
-
-        if (Platform.OS === 'android') {
-          this._finishRecording(true, filePath);
-        }
-        return filePath;
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    async _play() {
-      if (this.state.recording) {
-        await this._stop();
-      }
-
-      // These timeouts are a hacky workaround for some issues with react-native-sound.
-      // See https://github.com/zmxv/react-native-sound/issues/89.
-      setTimeout(() => {
-        var sound = new Sound(this.state.audioPath, '', (error) => {
-          if (error) {
-            console.log('failed to load the sound', error);
+              this.onReceive("I'm your father.");
+            }
           }
-        });
-
-        setTimeout(() => {
-          sound.play((success) => {
-            if (success) {
-              console.log('successfully finished playing');
-            } else {
-              console.log('playback failed due to audio decoding errors');
-            }
-          });
-        }, 100);
-      }, 100);
-    }
-
-    async _record() {
-      if (this.state.recording) {
-        console.warn('Already recording!');
-        return;
+        }
       }
 
-      if (!this.state.hasPermission) {
-        console.warn('Can\'t record, no permission granted!');
-        return;
-      }
+      this.setState((previousState) => {
+        return {
+          typingText: null,
+        };
+      });
+    }, 1000);
+  }
 
-      if(this.state.stoppedRecording){
-        this.prepareRecordingPath(this.state.audioPath);
-      }
+  onReceive(text) {
+    this.setState((previousState) => {
+      return {
+        messages: GiftedChat.append(previousState.messages, {
+          _id: Math.round(Math.random() * 1000000),
+          text: text,
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'Sith lord Darth Vader',
+            avatar: 'https://i.imgflip.com/1ekvvz.jpg',
+          },
+        }),
+      };
+    });
+  }
 
-      this.setState({recording: true, paused: false});
-
-      try {
-        const filePath = await AudioRecorder.startRecording();
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    _finishRecording(didSucceed, filePath) {
-      this.setState({ finished: didSucceed });
-      console.log("t",filePath)
-      console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath}`);
-    }
-
-    render() {
-        
+  renderCustomActions(props) {
+    if (Platform.OS === 'ios') {
       return (
-        <View style={styles.container}>
-          <View style={styles.controls}>
-          <Button transparent title="voice" onPress={() => {
-            console.log("Voice of China!");
-            if(i==0){
-              this._record(),this.state.recording;
-              console.log("START!");
-              i=1;
-            }else if(i==1){
-              this._stop()
-              console.log("STOP!");
-              
-              i=0;
-            }
-          }} style={styles.welcome}><Text style={styles.progressText}>RECORD</Text>
-        </Button>
-        <Button onPress={() => {this._play()} } transparent><Text style={styles.progressText}>{this.state.currentTime}s</Text></Button>
-            
-            {/* {this._renderButton("PAUSE", () => {this._pause()} )}
-            {this._renderPauseButton(() => {this.state.paused ? this._resume() : this._pause()})} */}
-            
-          </View>
+        <CustomActions
+          {...props}
+        />
+      );
+    }
+    const options = {
+      'Image': (props) => {
+        console.log("Image")
+      },
+      'Video': (props) => {
+        console.log("Video")
+      },
+      'Cancel': () => {},
+    };
+    return (
+      <Actions
+        {...props}
+        options={options}
+      />
+    );
+  }
+
+  renderBubble(props) {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          left: {
+            backgroundColor: '#f0f0f0',
+          }
+        }}
+      />
+    );
+  }
+
+  renderCustomView(props) {
+    return (
+      <CustomView
+        {...props}
+      />
+    )
+  }
+
+  renderCustomActions(props){
+    return(
+      <CustomActions
+      {...props}
+      />
+    )
+  }
+
+
+  renderFooter(props) {
+    if (this.state.typingText) {
+      return (
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>
+            {this.state.typingText}
+          </Text>
         </View>
       );
     }
+    return null;
   }
 
-  var styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#2b608a",
-    },
-    controls: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      flex: 1,
-    },
-    progressText: {
-      padding:50,
-      color: "#fff"
-    },
-    button: {
-      padding: 20
-    },
-    disabledButtonText: {
-      color: '#eee'
-    },
-    buttonText: {
-      fontSize: 20,
-      color: "#fff"
-    },
-    activeButtonText: {
-      fontSize: 20,
-      color: "#B81F00"
-    }
+  render() {
+    return (
+      <GiftedChat
+        messages={this.state.messages}
+        onSend={this.onSend}
+        loadEarlier={this.state.loadEarlier}
+        onLoadEarlier={this.onLoadEarlier}
+        isLoadingEarlier={this.state.isLoadingEarlier}
 
-  });
+        user={{
+          _id: 1, // sent messages should have same user._id
+          // name: 'Admin',
+          // avatar: 'https://codepo8.github.io/canvas-images-and-pixels/img/horse.png',
+        }}
 
-export default AudioExample;
+        renderActions={this.renderCustomActions}
+        renderBubble={this.renderBubble}
+        renderCustomView={this.renderCustomView}
+        renderFooter={this.renderFooter}
+      />
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  footerContainer: {
+    marginTop: 5,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#aaa',
+  },
+});

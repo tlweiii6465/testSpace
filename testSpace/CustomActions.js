@@ -9,15 +9,18 @@ import {
   ViewPropTypes,
   Text,
 } from 'react-native';
+import { Grid, Row, Col, Container, Content, Button, List, ListItem, Header, Left, Icon, Body, Title, Right, Toast } from "native-base";
 import CustomView from "./CustomView";
 import CameraRollPicker from 'react-native-camera-roll-picker';
 import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
-var ImagePicker = require('react-native-image-picker');
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
 let audioPath = AudioUtils.DocumentDirectoryPath + '/test.aac';
+var ImagePicker = require('react-native-image-picker');
+
 export default class CustomActions extends React.Component {
   constructor(props) {
     super(props);
+    this.text="";
     this._images = [];
     this.state = {
       modalVisible: false,
@@ -72,14 +75,12 @@ export default class CustomActions extends React.Component {
             this.setImages([]);
             });
           break;
-        case 3:
-        AudioRecorder.prepareRecordingAtPath(audioPath, {
-          SampleRate: 22050,
-          Channels: 1,
-          AudioQuality: "Low",
-          AudioEncoding: "aac"
-        });
-        
+        case 3:  
+          this.props.onSend({
+            ////////////////
+            ////////////////
+          });
+      
           break;
         default:
       }
@@ -140,6 +141,7 @@ export default class CustomActions extends React.Component {
       return this.props.icon();
     }
     return (
+  
       <View
         style={[styles.wrapper, this.props.wrapperStyle]}
       >
@@ -149,6 +151,7 @@ export default class CustomActions extends React.Component {
           +
         </Text>
       </View>
+
     );
   }
 
