@@ -9,6 +9,7 @@ import {
   TouchableHighlight,
   Platform,
   PermissionsAndroid,
+  Button
 } from 'react-native';
 
 import Sound from 'react-native-sound';
@@ -206,7 +207,7 @@ class AudioExample extends Component {
       return (
         <View style={styles.container}>
           <View style={styles.controls}>
-            {this._renderButton("RECORD", () => {this._record()}, this.state.recording )}
+            <Button title="voice" onPress={() => {this._record(),this.state.recording}}></Button>
             {this._renderButton("PLAY", () => {this._play()} )}
             {this._renderButton("STOP", () => {this._stop()} )}
             {/* {this._renderButton("PAUSE", () => {this._pause()} )} */}
