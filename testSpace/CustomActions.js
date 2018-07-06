@@ -12,6 +12,8 @@ import {
 import CustomView from "./CustomView";
 import CameraRollPicker from 'react-native-camera-roll-picker';
 import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+import {AudioRecorder, AudioUtils} from 'react-native-audio';
+let audioPath = AudioUtils.DocumentDirectoryPath + '/test.aac';
 var ImagePicker = require('react-native-image-picker');
 export default class CustomActions extends React.Component {
   constructor(props) {
@@ -71,7 +73,12 @@ export default class CustomActions extends React.Component {
             });
           break;
         case 3:
-            this.setModalVisible(true);
+        AudioRecorder.prepareRecordingAtPath(audioPath, {
+          SampleRate: 22050,
+          Channels: 1,
+          AudioQuality: "Low",
+          AudioEncoding: "aac"
+        });
           break;
         default:
       }
