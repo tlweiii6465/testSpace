@@ -11,6 +11,10 @@ target 'testSpace' do
   
   pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'
 
+  pod 'RNAudio', :path => '../node_modules/react-native-audio'
+
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
   target 'testSpaceTests' do
     inherit! :search_paths
     # Pods for testing
