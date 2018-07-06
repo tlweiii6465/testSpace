@@ -182,7 +182,7 @@ export default class CustomActions extends React.Component {
           transparent={true}      
           visible={this.state.modalVisible2}
           onRequestClose={() => {
-            this.setModalVisible2(false);
+            // this.setModalVisible2(true);
           }}
         >
         <View style={{
@@ -190,8 +190,7 @@ export default class CustomActions extends React.Component {
           justifyContent: 'center',
           alignItems: 'center',
           }}>
-         <NavButton style={{
-           
+         <NavButton style={{       
            padding:20,
            backgroundColor:'rgba(0, 0, 0, .4)',
            borderRadius:40,
@@ -201,7 +200,18 @@ export default class CustomActions extends React.Component {
           justifyContent: 'center',
           alignItems: 'center',
           }} onPress={() => {
-          this.setModalVisible2(false);
+            console.log("Voice of China!");
+            if(i==0){
+              this._record(),this.state.recording;
+              console.log("START!");
+              i=1;
+            }else if(i==1){
+              this._stop()
+              console.log("STOP!"); 
+              this.setModalVisible2(false);     
+              i=0;
+            }
+          
         }}>
           <NavButtonText>
             <Image source={require('./asset/imgs/white-speak.png')} />           
