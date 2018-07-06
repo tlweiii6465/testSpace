@@ -14,7 +14,7 @@ import {
 
 import Sound from 'react-native-sound';
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
-
+var i = 0;
 class AudioExample extends Component {
 
     state = {
@@ -203,13 +203,24 @@ class AudioExample extends Component {
     }
 
     render() {
-
+        
       return (
         <View style={styles.container}>
           <View style={styles.controls}>
-            <Button title="voice" onPress={() => {this._record(),this.state.recording}}></Button>
+          <Button title="voice" onPress={() => {
+            console.log("Voice of China!");
+            if(i==0){
+              this._record(),this.state.recording;
+              console.log("START!");
+              i=1;
+            }else if(i==1){
+              this._stop()
+              console.log("STOP!");
+              i=0;
+            }
+          }} style={styles.welcome}>   
+        </Button>
             {this._renderButton("PLAY", () => {this._play()} )}
-            {this._renderButton("STOP", () => {this._stop()} )}
             {/* {this._renderButton("PAUSE", () => {this._pause()} )} */}
             {this._renderPauseButton(() => {this.state.paused ? this._resume() : this._pause()})}
             <Text style={styles.progressText}>{this.state.currentTime}s</Text>
