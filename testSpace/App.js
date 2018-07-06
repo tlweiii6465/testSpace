@@ -9,16 +9,15 @@ import {
   TouchableHighlight,
   Platform,
   PermissionsAndroid,
-  Button
 } from 'react-native';
-
+import { Grid, Row, Col, Container, Left, Button, Icon, Body, Right } from 'native-base';
 import Sound from 'react-native-sound';
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
 var i = 0;
 class AudioExample extends Component {
 
     state = {
-      currentTime: 0.0,
+      currentTime: "",
       recording: false,
       paused: false,
       stoppedRecording: false,
@@ -199,6 +198,7 @@ class AudioExample extends Component {
 
     _finishRecording(didSucceed, filePath) {
       this.setState({ finished: didSucceed });
+      console.log("t",filePath)
       console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath}`);
     }
 
@@ -207,7 +207,7 @@ class AudioExample extends Component {
       return (
         <View style={styles.container}>
           <View style={styles.controls}>
-          <Button title="voice" onPress={() => {
+          <Button transparent title="voice" onPress={() => {
             console.log("Voice of China!");
             if(i==0){
               this._record(),this.state.recording;
@@ -216,14 +216,16 @@ class AudioExample extends Component {
             }else if(i==1){
               this._stop()
               console.log("STOP!");
+              
               i=0;
             }
-          }} style={styles.welcome}>   
+          }} style={styles.welcome}><Text style={styles.progressText}>RECORD</Text>
         </Button>
-            {this._renderButton("PLAY", () => {this._play()} )}
-            {/* {this._renderButton("PAUSE", () => {this._pause()} )} */}
-            {this._renderPauseButton(() => {this.state.paused ? this._resume() : this._pause()})}
-            <Text style={styles.progressText}>{this.state.currentTime}s</Text>
+        <Button onPress={() => {this._play()} } transparent><Text style={styles.progressText}>{this.state.currentTime}s</Text></Button>
+            
+            {/* {this._renderButton("PAUSE", () => {this._pause()} )}
+            {this._renderPauseButton(() => {this.state.paused ? this._resume() : this._pause()})} */}
+            
           </View>
         </View>
       );
@@ -241,8 +243,7 @@ class AudioExample extends Component {
       flex: 1,
     },
     progressText: {
-      paddingTop: 50,
-      fontSize: 50,
+      padding:50,
       color: "#fff"
     },
     button: {
