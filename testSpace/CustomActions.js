@@ -202,11 +202,11 @@ export default class CustomActions extends React.Component {
           }} onPress={() => {
             console.log("Voice of China!");
             if(i==0){
-              this._record(),this.state.recording;
+              //this._record(),this.state.recording;
               console.log("START!");
               i=1;
             }else if(i==1){
-              this._stop()
+              //this._stop()
               console.log("STOP!"); 
               this.setModalVisible2(false);     
               i=0;
