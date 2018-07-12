@@ -1,42 +1,24 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { Text,View } from 'react-native';
+import LottieView from 'lottie-react-native';
 
-import { Platform, AsyncStorage, AppState, StyleSheet,View, Text,Button } from 'react-native';
+export default class BasicExample extends React.Component {
+  componentDidMount() {
+    this.animation.play();
+    // Or set a specific startFrame and endFrame with:
+    // this.animation.play(30, 120);
+  }
 
-import { Toast } from "native-base";
-
-
-export default class App extends Component{
-  
-  render(){
-    return(
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Master Branch
-        </Text>
-        <Text style={styles.instructions}>
-          Getting Start 
-        </Text>
-        
+  render() {
+    return (
+      <View style={{height:"100%",width:"100%"}}>
+      <LottieView
+        ref={animation => {
+          this.animation = animation;
+        }}
+        source={require('./asset/imgs/LineAnimation.json')}
+      /><Text>TEST</Text>
       </View>
-    )
+    );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
