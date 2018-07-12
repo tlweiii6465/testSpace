@@ -16,9 +16,6 @@ export default class App extends Component{
         <Text style={styles.instructions}>
           Getting Start 
         </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
         
       </View>
     )
