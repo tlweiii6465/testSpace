@@ -1,24 +1,41 @@
-import React, {Component} from 'react';
+import React from 'react';
 
-import { Platform, AsyncStorage, AppState, StyleSheet,View, Text,Button } from 'react-native';
+import { StyleSheet,View, Text,ActivityIndicator } from 'react-native';
 
-import { Toast } from "native-base";
+import  MainService from "./app/services/mainservice";
 
-
-export default class App extends Component{
+export default class App extends React.Component{
+  constructor(){
+    super()
+    this.state={
+      showME:true
+    }
+    
+  }
   
+  componentWillMount(){
+    setTimeout(()=>{
+      this.setState({
+        showME:false
+      })
+    },
+    2000)
+  }
+
   render(){
     return(
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Master Branch
-        </Text>
-        <Text style={styles.instructions}>
-          Getting Start 
-        </Text>
-        
+         {
+           this.state.showME ? 
+        <ActivityIndicator size="large"/> 
+        :
+        <View>
+          <Text>Welcome!</Text>
+        </View>
+        } 
       </View>
-    )
+      
+    );
   }
 }
 
