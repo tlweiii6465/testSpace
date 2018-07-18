@@ -11,6 +11,8 @@ target 'testSpace' do
   
   pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'
 
+  pod 'Interactable', :path => '../node_modules/react-native-interactable'
+
   target 'testSpaceTests' do
     inherit! :search_paths
     # Pods for testing
