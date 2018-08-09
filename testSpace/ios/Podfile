@@ -11,6 +11,10 @@ target 'testSpace' do
   
   pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'
 
+  pod 'lottie-react-native', :path => '../node_modules/lottie-react-native'
+
+  pod 'react-native-fast-image', :path => '../node_modules/react-native-fast-image'
+
   target 'testSpaceTests' do
     inherit! :search_paths
     # Pods for testing
